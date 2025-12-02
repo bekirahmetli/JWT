@@ -5,6 +5,8 @@ import com.example.entities.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -44,6 +46,23 @@ public class AppConfig {
                 return optional.orElseThrow(() -> new UsernameNotFoundException("User not found"));
             }
         };
+    }
+
+    /**
+     * AuthenticationProvider bean tanımıdır.
+     * Spring Security'nin kullanıcı doğrulama sürecinde kullanılır.
+     *
+     * Burada DaoAuthenticationProvider kullanıyoruz:
+     * - UserDetailsService aracılığıyla kullanıcı bilgilerini yükler.
+     * - PasswordEncoder ile parolaların doğruluğunu kontrol eder.
+     *
+     * @return AuthenticationProvider
+     */
+    @Bean
+    public AuthenticationProvider authenticationProvider(){
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService());
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        return authenticationProvider;
     }
 
     /**
