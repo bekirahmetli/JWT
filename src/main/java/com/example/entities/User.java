@@ -44,6 +44,6 @@ public class User implements UserDetails {//UserDetail interfacesi hazır bir ja
      */
     @Override
     public String getUsername() {
-        return "";
+        return this.userName;
     }
 }
