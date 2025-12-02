@@ -7,6 +7,7 @@ import com.example.entities.User;
 import com.example.jwt.AuthRequest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -19,6 +20,8 @@ public class AuthManager implements IAuthService {
     @Autowired
     private UserRepo userRepo;
 
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
     /**
      * Yeni bir kullanıcı kaydı oluşturur.
      *
@@ -31,7 +34,7 @@ public class AuthManager implements IAuthService {
         User user = new User();
 
         user.setUserName(request.getUsername());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         User savedUser = userRepo.save(user);
         BeanUtils.copyProperties(savedUser,dtoUser);
