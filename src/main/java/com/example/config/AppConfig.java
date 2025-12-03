@@ -39,7 +39,7 @@ public class AppConfig {
             @Override
             public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
                 //Kullanıcı adıyla veritabanından kullanıcıyı arıyoruz.Eğer kullanıcı bulunamazsa UsernameNotFoundException fırlatılır.
-                Optional<User> optional = userRepo.findByUsername(username);
+                Optional<User> optional = userRepo.findByUserName(username);
                 if(optional.isPresent()){
                     return optional.get();
                 }
