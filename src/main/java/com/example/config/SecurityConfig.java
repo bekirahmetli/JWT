@@ -1,5 +1,6 @@
 package com.example.config;
 
+import com.example.jwt.AuthEntryPoint;
 import com.example.jwt.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -35,7 +36,8 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
     // JWT doğrulama ve filtreleme işlemleri için özel filtre
-
+    @Autowired
+    private AuthEntryPoint authEntryPoint;
 
     /**
      * Spring Security Filter Chain bean tanımı.
@@ -52,6 +54,9 @@ public class SecurityConfig {
                         .requestMatchers(AUTHENTICATE, REGISTER).permitAll()// Giriş ve kayıt URL'leri herkese açık
                         .anyRequest().authenticated() // Diğer tüm istekler kimlik doğrulaması gerektirir
                 )  // Session yönetimini stateless olarak ayarlıyoruz (JWT için gereklidir)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authEntryPoint)
+                )
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
