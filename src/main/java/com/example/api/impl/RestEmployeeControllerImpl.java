@@ -3,8 +3,7 @@ package com.example.api.impl;
 import com.example.api.IRestEmployeeController;
 import com.example.business.abstracts.IEmployeeService;
 import com.example.dto.DtoEmployee;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +29,7 @@ public class RestEmployeeControllerImpl implements IRestEmployeeController {
      */
     @GetMapping("/{id}")
     @Override
-    public DtoEmployee findEmployeeById(@Valid @NotEmpty @PathVariable("id") Long id) {
+    public DtoEmployee findEmployeeById(@Positive @PathVariable("id") Long id) {
         return employeeService.findEmployeeById(id);
     }
 }
