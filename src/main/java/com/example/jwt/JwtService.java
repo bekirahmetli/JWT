@@ -45,20 +45,40 @@ public class JwtService {
     }
 
     /**
-     * JWT içerisindeki Claim'leri çözerek geri döndürür.
-     * Token çözecek metot
-     * @param token JWT Token
-     * @param claimsTFunction Claims nesnesi üzerinden dönüş yapılacak fonksiyon
-     * @param <T> Dönüş tipi
-     * @return Claim üzerinden üretilmiş sonuç
+     * Verilen JWT token içerisindeki belirli bir Claim değerini döndürür.
+     *
+     * @param token JWT token
+     * @param key    Claim anahtarı
+     * @return İlgili Claim değeri
      */
-    public <T> T exportToken(String token, Function<Claims, T> claimsTFunction){
+    public Object getClaimsByKey(String token,String key){
+        Claims claims = getClaims(token);
+        return claims.get(key);
+    }
+
+    /**
+     * Verilen JWT token'ı çözerek içindeki tüm Claim değerlerini döndürür.
+     *
+     * @param token JWT token
+     * @return Token içerisindeki Claims gövdesi
+     */
+    public Claims getClaims(String token){
         Claims claims = Jwts
                 .parser()// Parser oluşturulur
                 .setSigningKey(getKey())// Token doğrulaması için imzalama anahtarı eklenir
                 .build() // Parser instance oluşturulur
                 .parseClaimsJws(token)// Token parse edilir ve imzalı claim’ler alınır
                 .getBody();// Claims gövdesi alınır
+        return claims;
+    }
+
+
+    /**
+     * Token içerisindeki Claim'leri çözer ve verilen fonksiyon aracılığıyla
+     * istenen türde bir sonuç döndürür.
+     */
+    public <T> T exportToken(String token, Function<Claims, T> claimsTFunction){
+        Claims claims = getClaims(token);
         return claimsTFunction.apply(claims);
     }
 
