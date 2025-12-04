@@ -4,6 +4,7 @@ import com.example.api.IRestAuthController;
 import com.example.business.abstracts.IAuthService;
 import com.example.dto.DtoUser;
 import com.example.jwt.AuthRequest;
+import com.example.jwt.AuthResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,5 +33,18 @@ public class RestAuthControllerImpl implements IRestAuthController {
     @Override
     public DtoUser register(@Valid @RequestBody AuthRequest request) {
         return authService.register(request);
+    }
+
+    /**
+     * Kullanıcının kimlik doğrulama (login) işlemini gerçekleştirir.
+     * Kullanıcı adı ve parolası doğrulanır; başarılı olması durumunda JWT token oluşturulur ve kullanıcıya döndürülür.
+     *
+     * @param request HTTP isteği gövdesinde gönderilen kimlik doğrulama bilgilerini içeren AuthRequest DTO'su.
+     * @return JWT token ve kullanıcı bilgilerini içeren AuthResponse nesnesi
+     */
+    @PostMapping("/authenticate")
+    @Override
+    public AuthResponse authenticate(@Valid @RequestBody AuthRequest request) {
+        return authService.authenticate(request);
     }
 }
