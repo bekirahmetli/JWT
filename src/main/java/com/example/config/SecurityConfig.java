@@ -29,6 +29,8 @@ public class SecurityConfig {
     public static final String AUTHENTICATE = "/authenticate";
     //Kullanıcı kayıt (register) URL'si
     public static final String REGISTER = "/register";
+    // Mevcut refresh token ile yeni access token alınacak endpoint URL'si
+    public static final String REFRESH_TOKEN = "/refreshToken";
 
     @Autowired
     private AuthenticationProvider authenticationProvider;
@@ -51,7 +53,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http){
         http.csrf(csrf -> csrf.disable())// CSRF korumasını devre dışı bırakıyoruz (REST API için tipik)
                 .authorizeHttpRequests(auth -> auth// URL bazlı yetkilendirme kuralları
-                        .requestMatchers(AUTHENTICATE, REGISTER).permitAll()// Giriş ve kayıt URL'leri herkese açık
+                        .requestMatchers(AUTHENTICATE, REGISTER,REFRESH_TOKEN).permitAll()// Giriş ve kayıt URL'leri herkese açık
                         .anyRequest().authenticated() // Diğer tüm istekler kimlik doğrulaması gerektirir
                 )  // Session yönetimini stateless olarak ayarlıyoruz (JWT için gereklidir)
                 .exceptionHandling(ex -> ex
