@@ -2,9 +2,11 @@ package com.example.api.impl;
 
 import com.example.api.IRestAuthController;
 import com.example.business.abstracts.IAuthService;
+import com.example.business.abstracts.IRefreshTokenService;
 import com.example.dto.DtoUser;
 import com.example.jwt.AuthRequest;
 import com.example.jwt.AuthResponse;
+import com.example.jwt.RefreshTokenRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +24,8 @@ public class RestAuthControllerImpl implements IRestAuthController {
     @Autowired
     private IAuthService authService;
 
+    @Autowired
+    private IRefreshTokenService refreshTokenService;
     /**
      * Yeni bir kullanıcı kaydı oluşturur.
      *
@@ -46,5 +50,17 @@ public class RestAuthControllerImpl implements IRestAuthController {
     @Override
     public AuthResponse authenticate(@Valid @RequestBody AuthRequest request) {
         return authService.authenticate(request);
+    }
+    /**
+     * Kullanıcının mevcut refresh token'ı ile yeni bir access token üretmesini sağlar.
+     * Refresh token doğrulanır ve süresi geçmemişse yeni JWT access token oluşturulur.
+     *
+     * @param request HTTP isteği gövdesinde gönderilen RefreshTokenRequest nesnesi
+     * @return Yeni access token ve mevcut/yenilenmiş refresh token bilgisini içeren AuthResponse nesnesi
+     */
+    @PostMapping("/refreshToken")
+    @Override
+    public AuthResponse refreshToken(@RequestBody RefreshTokenRequest request) {
+        return refreshTokenService.refreshToken(request);
     }
 }
