@@ -1,8 +1,10 @@
 package com.example.business.concretes;
 
 import com.example.business.abstracts.IAuthService;
+import com.example.dao.RefreshTokenRepo;
 import com.example.dao.UserRepo;
 import com.example.dto.DtoUser;
+import com.example.entities.RefreshToken;
 import com.example.entities.User;
 import com.example.jwt.AuthRequest;
 import com.example.jwt.AuthResponse;
@@ -13,7 +15,10 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Kimlik doğrulama (Authentication) ile ilgili iş mantığını gerçekleştiren servis sınıfıdır.
@@ -33,6 +38,9 @@ public class AuthManager implements IAuthService {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private RefreshTokenRepo refreshTokenRepo;
     /**
      * Yeni bir kullanıcı kaydı oluşturur.
      *
@@ -50,6 +58,20 @@ public class AuthManager implements IAuthService {
         User savedUser = userRepo.save(user);
         BeanUtils.copyProperties(savedUser,dtoUser);
         return dtoUser;
+    }
+    /**
+     * Verilen kullanıcıya ait yeni bir refresh token oluşturur.
+     * Refresh token, kullanıcıya uzun süreli oturum sağlayan bir ek güvenlik belirtecidir.
+     *
+     * @param user Token üretilecek kullanıcı
+     * @return Üretilmiş refresh token entity nesnesi
+     */
+    private RefreshToken createRefreshToken(User user){
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setRefreshToken(UUID.randomUUID().toString()); // Rastgele bir refresh token değeri oluşturulur
+        refreshToken.setExpireDate(new Date(System.currentTimeMillis() + 1000*60*60*4));// Refresh token 4 saat geçerli olacak şekilde expiry süresi ayarlanır
+        refreshToken.setUser(user);// Token hangi kullanıcıya ait ise ilişkilendirilir
+        return refreshToken;
     }
 
     /**
@@ -70,8 +92,11 @@ public class AuthManager implements IAuthService {
 
             Optional<User> optionalUser = userRepo.findByUserName(request.getUsername()); // Kullanıcı veritabanında aranır
 
-            String token = jwtService.generateToken(optionalUser.get());// Kullanıcı bulunduysa token oluşturulur
-            return new AuthResponse(token);// JWT token response olarak döndürülür
+            String accessToken = jwtService.generateToken(optionalUser.get());// Kullanıcı bulunduysa access token üretilir
+
+            RefreshToken refreshToken = createRefreshToken(optionalUser.get());// Refresh token oluşturulur ve kaydedilir
+            refreshTokenRepo.save(refreshToken);
+            return new AuthResponse(accessToken,refreshToken.getRefreshToken()); // Access token + refresh token response olarak döndürülür
         } catch (Exception e) {
             throw new RuntimeException("Kullanıcı adı veya şifre hatalı", e);
         }
