@@ -1,6 +1,7 @@
 package com.example.api;
 
 import com.example.dto.DtoEmployee;
+import jakarta.validation.constraints.Positive;
 
 /**
  * Employee ile ilgili REST endpointlerini tanımlayan controller arayüzüdür.
@@ -14,5 +15,5 @@ public interface IRestEmployeeController {
      * @param id Çalışanın veritabanındaki benzersiz kimliği
      * @return Çalışan bilgilerini taşıyan DtoEmployee nesnesi
      */
-    public DtoEmployee findEmployeeById(Long id);
+    public DtoEmployee findEmployeeById(@Positive Long id);
 }
