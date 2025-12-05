@@ -41,6 +41,12 @@ public class SecurityConfig {
     @Autowired
     private AuthEntryPoint authEntryPoint;
 
+    public static final String[] SWAGGER_PATHS = {
+            "/swagger-ui/**",//** ifadesi altındaki tüm URL'leri kapsar
+            "/v3/api-docs/**",
+            "/swagger-ui.html"
+    };
+
     /**
      * Spring Security Filter Chain bean tanımı.
      * HTTP güvenlik kuralları burada yapılandırılır.
@@ -54,6 +60,7 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())// CSRF korumasını devre dışı bırakıyoruz (REST API için tipik)
                 .authorizeHttpRequests(auth -> auth// URL bazlı yetkilendirme kuralları
                         .requestMatchers(AUTHENTICATE, REGISTER,REFRESH_TOKEN).permitAll()// Giriş ve kayıt URL'leri herkese açık
+                        .requestMatchers(SWAGGER_PATHS).permitAll()
                         .anyRequest().authenticated() // Diğer tüm istekler kimlik doğrulaması gerektirir
                 )  // Session yönetimini stateless olarak ayarlıyoruz (JWT için gereklidir)
                 .exceptionHandling(ex -> ex
